@@ -1,7 +1,7 @@
 
 // load product list at beginning
 
-var baseURL = "http://localhost:4000/api/v1.0";
+var baseURL = "http://localhost:9095";
 var productListUrl = baseURL+"/productList";
 
 var getReviewURL = baseURL+"/reviews"
@@ -38,7 +38,7 @@ var url = productListUrl+"?" ;
         var reqOptions ={
             productId: activeProductId,
             limit : 20,
-            order: 0,
+            offset: 0,
             sortBy :"helpfulness"
         }
         getReviews(activeProductId,reqOptions, null,populateProduct);
@@ -50,14 +50,14 @@ var url = productListUrl+"?" ;
 function getReviews(productId, options, offset, populateProduct){
     var reviewUrl = getReviewURL+"?";
 
-    if(options && options.entityId){
+    if(options && options.productId){
         reviewUrl = reviewUrl + "entityId=" +productId +" &";
     }
     if(options && options.limit){
         reviewUrl = reviewUrl + "limit= " +options.limit +" &";
     }
-    if(options && options.order){
-        reviewUrl = reviewUrl + "order="+options.order +" &";
+    if(options && options.offset){
+        reviewUrl = reviewUrl + "offset="+options.offset +" &";
     }
     if(options && options.sortBy){
         reviewUrl = reviewUrl + "sortBy="+ options.sortBy;
@@ -75,7 +75,7 @@ function getReviewList(productList){
     productList.foreach(function (productId){
         var options ={
             productId: productId,
-            limit : 20,
+            limit : 50,
             order: 0,
             sortBy :"helpfulness"
         }
@@ -157,14 +157,26 @@ var data ={
     "rating": CUSTOMER_RATING
    }
 
-$.post(postReviews,data,(resp,status,xhr)=>{
+/*$.post(postReviews, headers: { 'contentType': 'application/json' }, data,(resp,status,xhr)=>{
     console.log(resp);
-} ,"json")
-
+} ,"json")*/
+$.ajax({
+    url: postReviews,
+    type: 'post',
+    data: JSON.stringify(data),
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    dataType: 'json',
+    success: function (data) {
+        console.info(data);
+    }
+});
     alert( "review posted successfully" );
     $("#reviewDescription").val("");
     $("#reviewTitle").val("");
 })
+
 
 
 function populateReviews(reviewList){
